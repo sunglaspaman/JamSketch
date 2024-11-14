@@ -9,9 +9,11 @@ class NoteSeqGeneratorGuided implements MusicCalculator {
   def beatsPerMeas
   def bigram
   def unigram1
+  def dissonance
 
   def w1 = 1.0
   def w2 = 1.0
+  def w3 = 1.0
 
   NoteSeqGeneratorGuided(noteLayer, chordLayer, guidepart, mr, initial,
   				    beatsPerMeas) {
@@ -25,6 +27,7 @@ class NoteSeqGeneratorGuided implements MusicCalculator {
     println(unigram1)
     println(bigram)
     decideRhythm()
+    println("this is consctructors")
   }
 
   def makeBigram() {
@@ -83,8 +86,17 @@ class NoteSeqGeneratorGuided implements MusicCalculator {
 	  prev == null ? calcLogBigram(i, null) :
 	  calcLogBigram(i, e_melody.prev().mostLikely)
 	println(logbigram)
-        score[i] = w1 * simil + w2 * logbigram
-      }
+  println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+  if(calcHarmony(getMusicElement(chordLayer, measure, tick),e_melody)==1){
+    harmony=-2147483647;
+  }
+  
+
+  
+  
+
+        score[i] = w1 * simil + w2 * logbigram+w3*harmony//
+      }//曲線への近さ 例：w3*harmony 
       e_melody.setEvidence(argmax(score))
     }
   }
@@ -109,4 +121,24 @@ class NoteSeqGeneratorGuided implements MusicCalculator {
     index
   }
 
+}
+
+
+
+
+def calcHarmony(MusicElement chmr,MusicElement nomr){
+  ChordSymbol c=chmr.getMostLikely();
+  int n=nomr.getMostLikely();
+  int find=0;
+  for (NoteSymbol c_note  : c.notes()) {
+    println("abs(n-c_note.number())==2="+abs(n-c_note.number())==2)
+    if (abs(n-c_note.number())==2){
+      find++
+    }
+  }
+  if(find==0){
+    return 0;
+  } else {
+    return 1;
+  }
 }

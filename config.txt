@@ -2,8 +2,9 @@ import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
 
 class Config {
-  String MIDFILENAME = "blues01.mid"
-  List<ChordSymbol2> chordprog = [C, F, C, C, F, F, C, C, G, F, C, G]
+  String MIDFILENAME = "chocho.mid"  //伴奏
+  List<ChordSymbol2> chordprog = [C, G, C, G, C, G, C, C, G, G, C, C]
+  int key = 0
   int NUM_OF_MEASURES = 12
   int NUM_OF_RESET_AHEAD = 1
   int DIVISION = 12
@@ -31,7 +32,8 @@ class Config {
   int GA_POPUL_SIZE = 200
   String GA_INIT = "tree"  // "random" or "tree"
 
-  def JAMSKETCH_ENGINE = "JamSketchEngineGA1" //"JamSketchEngineSimple"
+  // def JAMSKETCH_ENGINE = "JamSketchEngineGA1" //"JamSketchEngineSimple"
+  def JAMSKETCH_ENGINE = "JamSketchEngineSimpleR" 
 
   def ENT_BIAS = 0.0
   def RHYTHM_DENSITY = 6.0
@@ -51,7 +53,7 @@ class Config {
     //[onset: [-0.0833, 0.0833], dur: [0.0, 1.25], energy: [0.0, 1.99]]
     //[onset: [-0.0625, 0.0625], dur: [0.0, 1.25], energy: [0.0, 1.99]]
 
-   boolean SHOW_GUIDE = false
+   boolean SHOW_GUIDE = true   //メロディのガイド
    int CHANNEL_GUIDE = 2
    int CHANNEL_ACC = 1
    int GUIDE_SMOOTHNESS = 10

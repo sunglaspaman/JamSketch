@@ -3,15 +3,26 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
+import jp.crestmuse.cmx.misc.*
+import static jp.crestmuse.cmx.misc.ChordSymbol2.*
 
 class JamSketch extends SimplePianoRoll {
 
   GuideData guideData
-  MelodyData2 melodyData
+  MelodyData2R melodyData
   boolean nowDrawing = false
   String username = ""
   int fullMeasure
   int mCurrentMeasure
+  boolean restrictionIsFill = false
+  boolean isCatching = false
+
+  double nnOfMouseX 
+  double catchedX
+
+  PitchRestriction pitchRestriction
+
+  int mode=0
   
   static def CFG
 
@@ -21,12 +32,19 @@ class JamSketch extends SimplePianoRoll {
     showMidiOutChooser()
     def p5ctrl = new ControlP5(this)
     p5ctrl.addButton("startMusic").
-    setLabel("Start / Stop").setPosition(20, 645).
-      setSize(120, 40)
+    setLabel("Start / Stop").setPosition(20, 645).setSize(120, 40)
     p5ctrl.addButton("resetMusic").
     setLabel("Reset").setPosition(160, 645).setSize(120, 40)
     p5ctrl.addButton("loadCurve").
     setLabel("Load").setPosition(300, 645).setSize(120, 40)
+    p5ctrl.addButton("drawing").
+    setLabel("drawing").setPosition(440, 645).setSize(120, 40)
+    p5ctrl.addButton("edit").
+    setLabel("edit").setPosition(580, 645).setSize(120, 40)
+    p5ctrl.addButton("fillR").
+    setLabel("fillR").setPosition(720, 645).setSize(120, 40)
+    p5ctrl.addButton("restart").
+    setLabel("restart").setPosition(860, 645).setSize(120, 40)
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -39,7 +57,12 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void initData() {
-    melodyData = new MelodyData2(CFG.MIDFILENAME, width, this, this, CFG)
+
+    pitchRestriction = new PitchRestriction()
+    pitchRestriction.setData(CFG)
+    pitchRestriction.setRestrictionList()
+
+    melodyData = new MelodyData2R(CFG.MIDFILENAME, width, this, this, CFG, pitchRestriction)
     smfread(melodyData.scc.getMIDISequence())
     def part =
       melodyData.scc.getFirstPartWithChannel(CFG.CHANNEL_ACC)
@@ -51,10 +74,26 @@ class JamSketch extends SimplePianoRoll {
     if (CFG.SHOW_GUIDE)
       guideData = new GuideData(CFG.MIDFILENAME, width - 100, this)
     fullMeasure = dataModel.getMeasureNum() * CFG.REPEAT_TIMES;
+
+
+    //melodyData.restrictionList=pitchRestriction.restrictionList
   }
 
   void draw() {
-    super.draw()    
+    super.draw()   
+    if(restrictionIsFill){
+      fillRestriction() 
+      // int i=0
+      // for(List<Integer> rList : pitchRestriction.restrictionList){
+      //   print(i+" ")
+      //   i++
+      //   for (int note  : rList) {
+      //       print(note+"_")
+      //   }
+      //   println("↻")
+      // }
+      // i=0
+    }
     if (guideData != null)
       drawGuideCurve()
     if (CFG.FORCED_PROGRESS) {
@@ -62,11 +101,54 @@ class JamSketch extends SimplePianoRoll {
     }
     if(pmouseX < mouseX &&
             mouseX > beat2x(getCurrentMeasure(), getCurrentBeat()) + 10) {
+              //println(x2measure(mouseX)+"_"+x2tick(mouseX)+"_"+y2notenum(mouseY))
+              
       if (isUpdatable()) {
-        storeCursorPosition()
-        updateCurve()
+        if(mode==0){
+        
+          storeCursorPosition()
+          updateCurve()
+          println(notenum2y(y2notenum(mouseY))+"+"+mouseY)
+        }
+        if(mode==1){
+          println("111111111111111111")
+          if(isInside(mouseX, mouseY)){
+            nnOfMouseX = melodyData.engine.getNotenum(x2measure(mouseX),calcTick(x2beat(mouseX)))
+          }
+
+          //println(x2measure(mouseX)+"_"+calcTick(x2beat(mouseX))+" "+mouseX+"_"+y2notenum(mouseY))
+          if(nowDrawing){
+            
+            // print(y2notenum(mouseY))
+            print("||||")
+            // print(nnOfMouseX)sas
+            // print("______")
+            // println(y2notenum(pmouseY) as int % 12  ==nnOfMouseX as int)
+            if(isCatching){
+
+            // melodyData.engine.change(x2measure(mouseX),x2tick(mouseX),y2notenum(mouseY))
+              melodyData.engine.change(x2measure(catchedX),calcTick(x2beat(catchedX)),y2notenum(mouseY))
+              
+            }
+          }
+        }
       }
+
     }
+
+    // if(mode==1){
+    //   if(mousePressed){
+    //     if(isCatching)
+    //   fill(255,165,0)
+    //   def eSt=melodyData.engine.getStartElement(x2measure(mouseX),calcTick(x2beat(mouseX)))
+    //   double catchedMEsX1=beat2x(eSt.getMeasureNum() as double,eSt.tick() as double)
+    //   def eEd=melodyData.engine.getEndElement(x2measure(mouseX),calcTick(x2beat(mouseX)))
+    //   double catchedMEsX2=beat2x(eEd.getMeasureNum() as double,eEd.tick() as double)
+      
+    //   rect(catchedMEsX1,notenum2y(y2notenum(mouseY)),catchedMEsX2-catchedMEsX1,-17.5)
+    //   }
+    // }
+
     drawCurve()
     if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - CFG.NUM_OF_RESET_AHEAD)
       processLastMeasure()
@@ -84,6 +166,7 @@ class JamSketch extends SimplePianoRoll {
           melodyData.curve1[i+1] != null) {
         line(i, melodyData.curve1[i] as int, i+1,
              melodyData.curve1[i+1] as int)
+             //println(i+" "+ melodyData.curve1[i] as int)
       }
     }    
   }
@@ -147,7 +230,7 @@ class JamSketch extends SimplePianoRoll {
       int mtotal = dataModel.getMeasureNum() *
                    CFG.REPEAT_TIMES
       textSize(32)
-      fill(0, 0, 0)
+      fill(0, 255, 0)
       text(mCurrentMeasure + " / " + mtotal, 460, 675)
     }
   }
@@ -245,10 +328,24 @@ class JamSketch extends SimplePianoRoll {
 
   void mousePressed() {
     nowDrawing = true
+    if(isInside(mouseX,mouseY)){
+      nnOfMouseX = melodyData.engine.getNotenum(x2measure(mouseX),calcTick(x2beat(mouseX)))
+
+      
+    
+      if(y2notenum(pmouseY) as int % 12 ==nnOfMouseX as int){
+        isCatching=true
+        catchedX=mouseX
+      // catchingMeasure=x2measure(mouseX)
+      // catchTick=calcTick(x2beat(mouseX))
+      }
+    }
   }
   
   void mouseReleased() {
     nowDrawing = false
+    isCatching= false
+    
     if (isInside(mouseX, mouseY)) {
       println(x2measure(mouseX))
       println(CFG.NUM_OF_MEASURES)
@@ -258,6 +355,7 @@ class JamSketch extends SimplePianoRoll {
            CFG.DIVISION - 1)
       }
     }
+    
   }
 
   void mouseDragged() {
@@ -277,6 +375,17 @@ class JamSketch extends SimplePianoRoll {
       println("Visible=${isVisible()}")
 //    } else if (key == 'u') {
 //      melodyData.updateCurve('all')
+    }else if(keyCode == CONTROL){
+      mode=0
+      print(mode)
+    }
+  }
+
+  void keyPressed(){
+    //int i=0
+    if(keyCode == CONTROL){
+      mode=1
+      print(mode)
     }
   }
 
@@ -290,6 +399,59 @@ class JamSketch extends SimplePianoRoll {
     JamSketch.CFG = evaluate(new File("./config.txt"))
     JamSketch.start("JamSketch")
   }
+
+  void drawing(){
+    mode=0
+  }
+  void edit(){
+    mode=1
+  }
+  void fillR(){
+    restrictionIsFill = ! restrictionIsFill
+  }
+
+  int calcTick(double beat){
+    double tick=beat
+    tick*=CFG.DIVISION
+    tick/=CFG.BEATS_PER_MEASURE
+    int inttick=tick as int 
+    inttick
+  }
+
+   void fillRestriction(){
+    ChordSymbol cs
+    int inCenterOfPR=48
+    //println(y2notenum(height))
+   //println("____________")
+    for(int i=0;i<12;i++){
+      cs= melodyData.engine.mr.getMusicElement(melodyData.engine.CHORD_LAYER, i as int, 7 as int).getMostLikely()
+      for (NoteSymbol c_note  : cs.notes()) {
+        // print(c_note)
+        // print(c_note.number())
+        // print("=|")
+        // print(notenum2y(48))
+        // print("-")
+        // print(notenum2y(47))
+        // print("|=")
+        // print("=|")
+        // print(beat2x(i,0))
+        // print("-")
+        // print(beat2x(i+1,0))
+        // print("|=")
+        fill(255,0,0,127)
+        rect(beat2x(i,0),notenum2y(c_note.number() as double +60),91,17.5)
+        
+      }
+      //println()
+    }
+
+    // ChordSymbol2 cs;
+    // for(int i=1;i<9;i++){
+
+    // }
+   }
+
+
 
 }
 JamSketch.CFG = evaluate(new File("./config.txt"))

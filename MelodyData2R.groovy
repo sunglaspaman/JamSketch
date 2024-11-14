@@ -1,15 +1,21 @@
-class MelodyData2 {
+class MelodyData2R {
   def width
   def pianoroll
   def engine
   def curve1
   def scc
   def cfg
+
+  PitchRestriction restrictionList
   
-  MelodyData2(filename, width, cmxcontrol, pianoroll, cfg) {
+  MelodyData2R(filename, width, cmxcontrol, pianoroll, cfg, restrictionList) {
     this.width = width
     this.pianoroll = pianoroll
     this.cfg = cfg
+
+    this.restrictionList=restrictionList
+    //println(restrictionList.beat2restrictionList(0))
+
     scc = cmxcontrol.readSMFAsSCC(filename)
     scc.repeat(cfg.INITIAL_BLANK_MEASURES * cfg.BEATS_PER_MEASURE *
 	       scc.division,
@@ -18,11 +24,38 @@ class MelodyData2 {
     def target_part = scc.getFirstPartWithChannel(1)
 //    engine = new JamSketchEngineSimple()
     engine = Class.forName(cfg.JAMSKETCH_ENGINE).newInstance()
+    engine.restrictionList=this.restrictionList
+    //println(engine.restrictionList.beat2restrictionList(0))
+    
+      //    print("JSEA")
+      // for(List<Integer> rList : engine.restrictionList){
+      //   print(i+" ")
+      //   i++
+      //   for (int note  : rList) {
+      //       print(note+"_")
+      //   }
+      //   println("↻")
+      // }
+      // i=0
+    //println(engine.restrictionList)
     engine.init(scc, target_part, cfg)
-
-    engine.setRestrictionList(restrictionList)
-
+ //         int i=0
+     //      print("JSEA")
+      // for(List<Integer> rList : engine.restrictionList){
+      //   print(i+" ")
+      //   i++
+      //   for (int note  : rList) {
+      //       print(note+"_")
+      //   }
+      //   println("↻")
+      // }
+      // i=0
     resetCurve()
+
+    engine.mr.name2layer.get(engine.OUTLINE_LAYER).calculators.get(0).restrictionList=this.restrictionList
+    println(engine.mr.name2layer.get(engine.OUTLINE_LAYER).calculators.get(0).restrictionList.beat2restrictionList(0))
+    print("MD2R")
+
   }
 
   def resetCurve() {
@@ -46,6 +79,12 @@ class MelodyData2 {
       }
     }
   }
+
+  // def setRestrictionList(List<List<Integer>> restrictionList){
+  //   this.restrictionList=restrictionList
+  //   //engine=setRestrictionList(restrictionList)
+  //   engine.restrictionList=this.restrictionList
+  // }
 
   def edit(){
     //engine

@@ -66,7 +66,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
     implementation 'org.codehaus.groovy:groovy:3.0.9'
     // https://mvnrepository.com/artifact/org.apache.ivy/ivy
-    implementation 'org.apache.ivy:ivy:2.4.0'
+    //implementation 'org.apache.ivy:ivy:2.4.0'
 
     // https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable
     implementation 'nz.ac.waikato.cms.weka:weka-stable:3.6.14'
@@ -88,6 +88,17 @@ dependencies {
 
 // https://mvnrepository.com/artifact/commons-logging/commons-logging
     implementation 'commons-logging:commons-logging:1.2'
+
+
+
+// added 20221212 yonamine yonamine blow 4 implementation
+    implementation 'xml-resolver:xml-resolver:1.2'
+    // https://mvnrepository.com/artifact/xerces/xercesImpl
+    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
+    // https://mvnrepository.com/artifact/xalan/xalan
+    implementation group: 'xalan', name: 'xalan', version: '2.7.2'
+    // https://mvnrepository.com/artifact/xalan/serializer
+    implementation 'xalan:serializer:2.7.2'
 
 }
 

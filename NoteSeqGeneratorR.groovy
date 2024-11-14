@@ -4,37 +4,69 @@ import jp.crestmuse.cmx.inference.models.*
 import java.util.*
 import jp.crestmuse.cmx.misc.*  
 
-class NoteSeqGenerator implements MusicCalculator {
+class NoteSeqGeneratorR implements MusicCalculator {
 
-  String noteLayer, chordLayer  //js EngineSimple からMELODY_LAYER, CHORD_LAYERを受け取るための変数
+  String noteLayer, chordLayer  
   Map<String,List<Double>> trigram
   List<List<Double>> bigram
   Map<String,List<Double>> chord_beat_dur_unigram
   double entropy_mean
-  double w1 = 0.5 //wnは音が選ばれる確率の
-  double w2 = 0.8 //
-  double w3 = 1.2 //
-  double w4 = 2.0 //
-  double w5 = 1.0 //
+  double w1 = 0.5 
+  double w2 = 0.8 
+  double w3 = 1.2 
+  double w4 = 2.0 
+  //double w5 = 1.0 
+  double w6 = 1.0
   int beatsPerMeas
   double entropy_bias
   double RHYTHM_THRS = 0.1
   def RHYTHM_WEIGHTS = [1, 0.2, 0.4, 0.8, 0.2, 0.4,
 			1, 0.2, 0.4, 0.8, 0.2, 0.4];
   
-  NoteSeqGenerator(noteLayer, chordLayer, beatsPerMeas, entropy_bias, model) {//コンストラクタ、jsEngineSimpleから受け取る
+  PitchRestriction restrictionList
+  //List<Integer> restr =Arrays.asList(0,4,7)
+  //List<Integer> restr2 =Arrays.asList(2,7,11)
+  // def cfg
+  // List<List<Integer>> restr
+  // List<Integer> restrAdd
+  // ChordSymbol cs
+  
+  NoteSeqGeneratorR(noteLayer, chordLayer, beatsPerMeas, entropy_bias, model) {
     this.noteLayer = noteLayer
     this.chordLayer = chordLayer
-    this.beatsPerMeas = beatsPerMeas  //小説当たりの拍の数
+    this.beatsPerMeas = beatsPerMeas  
     this.entropy_bias = entropy_bias
     trigram = model.trigram
     bigram = model.bigram
     chord_beat_dur_unigram = model.chord_beat_dur_unigram
     entropy_mean = model.entropy.mean
-  }
+
+    //this.restrictionList=restrictionList
+    //this.cfg=cfg
+    // for(int i=0;i<8;i++){
+    //   for(List<Integer> ri : restr){
+    //     for(ChodeSymbol ch : cfg.chordprog){
+          
+    //     }
+    //   }
+    // for(int i=0;i<3;i++){
+    // restrList.add(restr)
+    // restrList.add(restr2)
+    // }
+    // restrList.add(restr)
+    // restrList.add(restr)
+    // restrList.add(restr2)
+    // restrList.add(restr2)
+    // restrList.add(restr)
+    // restrList.add(restr)
+
+
+
+    
+     }
 
   @CompileStatic
-  Object prev(MusicElement e, int rep, Object ifnull) {//MELODY_LAYERからgetMusicElementをしてえられたMusicElementで、前の音を得る関数
+  Object prev(MusicElement e, int rep, Object ifnull) {
     if (e == null) {
       ifnull
     } else if (rep == 0) {
@@ -46,9 +78,13 @@ class NoteSeqGenerator implements MusicCalculator {
 
   @CompileStatic
   void updated(int measure, int tick, String layer,
-	      MusicRepresentation mr) { //旋律概形が変更された場合に音の選ばれる確率を決める関数
-    MusicElement e_curve = mr.getMusicElement(layer, measure, tick) //
-    double value = e_curve.getMostLikely() as double  //
+	      MusicRepresentation mr) { 
+          //
+              //print("JSEA")
+      print("tick:"+tick+" ")
+
+    MusicElement e_curve = mr.getMusicElement(layer, measure, tick) 
+    double value = e_curve.getMostLikely() as double  
     if (!Double.isNaN(value)) {
       MusicElement e_melo = mr.getMusicElement(noteLayer, measure, tick)
       boolean b = decideRhythm(value,
@@ -61,8 +97,7 @@ class NoteSeqGenerator implements MusicCalculator {
       getMostLikely() as ChordSymbol2
       List<Double> scores = []
       List<Integer> prevlist = []
-      int cnt=0
-
+      boolean inRestriction
       for (int i = 0; i < tick; i++) {
 	prevlist.add(
 	  mr.getMusicElement(noteLayer, measure, i).getMostLikely() as Integer)
@@ -74,21 +109,56 @@ class NoteSeqGenerator implements MusicCalculator {
 	double logchord = calcLogChordBeatUnigram(i, c, tick, beatsPerMeas,
 						  e_melo.duration(), mr)
 	double entdiff = calcEntropyDiff(i, prevlist)
+
+  double inRes;
   // double harmony 
   // harmony = calcHarmony(mr.getMusicElement(chordLayer, measure, tick),e_melo)
   // if(calcHarmony(mr.getMusicElement(chordLayer, measure, tick),e_melo)==1){
   //   harmony=-2147483647;  //provisional value
   // }
 
+  //int nn_of_e_melo=e_melo.getMostLikely();
+  // for(int ir : restr){
+  //   if(i%12==ir){
+  //     cnt++
+  //   }
+  // }
+  inRestriction=true
+  println("measure="+measure)
+  inRestriction=(restrictionList.beat2restrictionListByTick(tick).get(measure%12).contains(i) ? true :false )
+
+  //ir=(restr.contains(i) ? true :false )
+  // for(int j : restr){
+  //   print(i+" "+j+" "+ir)
+  //   println();
+  // }
+
   //println("simil:${simil},logtrigram:${logtrigram},logchord:${logchord},entdiff:${entdiff}")
-	scores[i] = w1 * simil + w2 * logtrigram + w3 * logchord +
-	  w4 * (-entdiff) //+w5 * harmony //選ばれる確率を求める計算式
+  if(!inRestriction){
+      //scores[i]*=2
+      inRes=-10000
+    }
+
+	// scores[i] = w1 * simil + w2 * logtrigram + w3 * logchord +
+	//   w4 * (-entdiff) +w6*inRes//+w5 * harmony //選ばれる確率を求める計算式
+  //   println(scores[i])
+  scores[i] = w1 * simil  +w6*inRes//+w5 * harmony //選ばれる確率を求める計算式
+    println(scores[i])
+    
 	
       }
-      e_melo.setEvidence(argmax(scores))
-    }
+      println("ir="+inRestriction)
+      // if(!ir){
+      //   e_melo.setEvidence(0)
+      // } else {
+      
+        e_melo.setEvidence(argmax(scores))
+      //}
+      
+      }
     }
   }
+        
 
   boolean decideRhythm(value, prev, tick, e, mr) {
     e.setTiedFromPrevious(false)
@@ -205,4 +275,8 @@ class NoteSeqGenerator implements MusicCalculator {
     }
     index
   }
+
+  // def setRestrictionList(List<List<Integer>> restrictionList){
+  //   this.restrictionList=restrictionList
+  // }
 }
