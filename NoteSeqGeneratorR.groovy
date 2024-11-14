@@ -82,7 +82,6 @@ class NoteSeqGeneratorR implements MusicCalculator {
           //
               //print("JSEA")
       print("tick:"+tick+" ")
-      print("Hello World")
 
     MusicElement e_curve = mr.getMusicElement(layer, measure, tick) 
     double value = e_curve.getMostLikely() as double  
