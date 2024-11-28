@@ -1,0 +1,5 @@
+mouseX:208
+mouseX:278
+mouseX:397
+mouseX:577
+mouseX:795

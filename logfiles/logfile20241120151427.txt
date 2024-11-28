@@ -1,0 +1,6 @@
+click:0
+mode:0
+start:(x:312,y:417)
+notenumber:0
+end:(x:748,y:311)
+

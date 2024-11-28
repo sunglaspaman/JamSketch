@@ -5,6 +5,7 @@ import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
+import java.io.File;
 
 class JamSketch extends SimplePianoRoll {
 
@@ -25,6 +26,19 @@ class JamSketch extends SimplePianoRoll {
   int mode=0
   
   static def CFG
+
+  PrintWriter output
+  static def outputFile
+  int clickNum=0
+
+  def prevElement 
+  def nowElement 
+  int pnn=-1
+  int nnn
+  int prevY
+
+
+  //String logFileName
 
   void setup() {
     super.setup()
@@ -54,7 +68,9 @@ class JamSketch extends SimplePianoRoll {
 
     initData()
     // add WindowListener (windowClosing) which calls exit();
+    makeLogFile()
   }
+
 
   void initData() {
 
@@ -111,7 +127,7 @@ class JamSketch extends SimplePianoRoll {
           println(notenum2y(y2notenum(mouseY))+"+"+mouseY)
         }
         if(mode==1){
-          println("111111111111111111")
+          //println("111111111111111111")
           if(isInside(mouseX, mouseY)){
             nnOfMouseX = melodyData.engine.getNotenum(x2measure(mouseX),calcTick(x2beat(mouseX)))
           }
@@ -151,7 +167,9 @@ class JamSketch extends SimplePianoRoll {
 
     drawCurve()
     if (getCurrentMeasure() == CFG.NUM_OF_MEASURES - CFG.NUM_OF_RESET_AHEAD)
-      processLastMeasure()
+      //processLastMeasure()
+      setTickPosition(0)
+
     melodyData.engine.setFirstMeasure(getDataModel().
       getFirstMeasure())
     enhanceCursor()
@@ -340,6 +358,9 @@ class JamSketch extends SimplePianoRoll {
       // catchTick=calcTick(x2beat(mouseX))
       }
     }
+    writeOperationLog(1)
+    output.flush();
+
   }
   
   void mouseReleased() {
@@ -356,9 +377,11 @@ class JamSketch extends SimplePianoRoll {
       }
     }
     
+    writeOperationLog(3)
   }
 
   void mouseDragged() {
+    writeOperationLog(2)
   }
 
   void keyReleased() {
@@ -378,7 +401,10 @@ class JamSketch extends SimplePianoRoll {
     }else if(keyCode == CONTROL){
       mode=0
       print(mode)
+    } else if (key == 'r') {
+      restart()
     }
+
   }
 
   void keyPressed(){
@@ -391,6 +417,7 @@ class JamSketch extends SimplePianoRoll {
 
   public void exit() {
     println("exit() called.")
+    output.close();
     super.exit()
     if (CFG.MOTION_CONTROLLER.any{mCtrl == "RfcommServer"}) RfcommServer.close()
   }
@@ -410,6 +437,10 @@ class JamSketch extends SimplePianoRoll {
     restrictionIsFill = ! restrictionIsFill
   }
 
+  void restart(){
+    setTickPosition(0)
+  }
+
   int calcTick(double beat){
     double tick=beat
     tick*=CFG.DIVISION
@@ -417,6 +448,9 @@ class JamSketch extends SimplePianoRoll {
     int inttick=tick as int 
     inttick
   }
+
+  void editMelody(){}
+  //
 
    void fillRestriction(){
     ChordSymbol cs
@@ -449,6 +483,69 @@ class JamSketch extends SimplePianoRoll {
     // for(int i=1;i<9;i++){
 
     // }
+   }
+
+   String getCurrent(){
+    String current=""
+    current+=year()
+    current+=nf(month(),2)
+    current+=nf(day(),2)
+    current+=nf(hour(),2)
+    current+=nf(minute(),2)
+    current+=nf(second(),2)
+   }
+
+   void makeLogFile(){
+    String logFileName="logfile"+getCurrent()+".txt"
+    println(logFileName)
+    String folderPath = sketchPath("logfiles"); // ディレクトリのパスを指定
+    File folder = new File(folderPath);
+  
+  // フォルダが存在しない場合は作成
+    if (!folder.exists()) {
+      folder.mkdirs();
+    }
+    String filePath = folderPath +"/"+ logFileName; // ファイル名を指定
+    output = createWriter(filePath);
+    //output.println("click = ");
+    //outputFile = evaluate(output)
+   }
+
+   void writeOperationLog(int mouseType){
+
+    //= mr.getMusicElement(MELODY_LAYER, measure, tick)
+    switch(mouseType){
+      case 1:
+        //mouseClicked
+        output.println("click:"+clickNum++)
+        output.println("mode:"+mode)
+        output.println("start:("+"x:"+mouseX+","+"y:"+mouseY+")");
+        //prevElement=melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, x2measure(mouseX),calcTick(x2beat(mouseX)))
+        //output.println("start:");
+        //outputFile.click++
+        //println(outputFile.click)
+        break;
+      case 2:
+        //mouseDragged
+        //nowElement = melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, x2measure(mouseX),calcTick(x2beat(mouseX)))
+        //nowElement = melodyData.engine(mostPrev(nowElement))
+        // if(prevElement!=nowElement){
+        //   prevElement=nowElement
+        //   nnn=prevElement.getMostLikely()  
+        // }
+        // if(pnn!=nnn){
+        //   pnn=nnn
+        //   output.print("notenumber:"+pnn)
+        //   output.println(" ("+"x:"+mouseX+","+"y:"+mouseY+")")
+        // }
+        
+        break;
+      case 3:
+        //mouseReleased
+        output.println("end:("+"x:"+mouseX+","+"y:"+mouseY+")")
+        output.println()
+        break;
+    }
    }
 
 

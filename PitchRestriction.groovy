@@ -5,6 +5,8 @@ import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
+import java.lang.reflect.Method;
+
 class PitchRestriction {
 
     def cfg
@@ -12,6 +14,8 @@ class PitchRestriction {
     List<List<Integer>> restrictionListUp=[]
     MelodyData2R melodyData
     int divisionOfBeats
+    int step
+    List<Integer> instep = []
 
     PitchRestriction(){
         //
@@ -48,11 +52,7 @@ class PitchRestriction {
 
     List<List<Integer>> beat2restrictionListByTick(int tick){
         int beat = tick / divisionOfBeats as int
-        if(beat%2==0){
-            return restrictionListDown
-        } else {
-            return restrictionListUp
-        }
+        return beat2restrictionList(beat)
     }
     List<List<Integer>> tick2restrictionList(int tick){
         if(tick%(divisionOfBeats*2)==0){
@@ -92,6 +92,14 @@ class PitchRestriction {
             int addScale=ScaleAdd.get(j)
             pitchList.add(baseNotenumber)
             baseNotenumber+=addScale
+        }
+        return pitchList
+    }
+
+    List<Integer> noRestrinction(i){
+        List<Integer> pitchList =[]
+        for(int j=0;j<12;j++){
+            pitchList.add(j)
         }
         return pitchList
     }

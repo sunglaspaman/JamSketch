@@ -1,0 +1,10 @@
+click:0
+mode:0
+start:(x:427,y:479)
+end:(x:842,y:382)
+
+click:1
+mode:0
+start:(x:824,y:379)
+end:(x:1012,y:258)
+

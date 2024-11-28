@@ -1,0 +1,16 @@
+click = 
+mouseX:469
+mouseX:500
+mouseX:777
+mouseX:769
+mouseX:769
+mouseX:769
+mouseX:752
+mouseX:777
+mouseX:817
+mouseX:796
+mouseX:695
+mouseX:616
+mouseX:659
+mouseX:897
+mouseX:652
