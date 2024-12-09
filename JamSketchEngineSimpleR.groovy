@@ -76,13 +76,13 @@ class JamSketchEngineSimpleR extends JamSketchEngineAbstract {
           return e
   }
 
-  MusicElement mostPrev(MusicElement e){
-    while (e.prev().tiedFromPrevious()) {
-      e = e.prev();
-      //println(e.measure() + " " + e.tick())
-    }
-    return e
-  }
+  // MusicElement mostPrev(MusicElement e){
+  //   while (e.prev().tiedFromPrevious()) {
+  //     e = e.prev();
+  //     //println(e.measure() + " " + e.tick())
+  //   }
+  //   return e
+  // }
 
   // def setRestrictionList(List<List<Integer>> restrictionList){
   //   this.restrictionList=restrictionList
