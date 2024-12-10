@@ -21,7 +21,8 @@ class JamSketch extends SimplePianoRoll {
   double nnOfMouseX 
   double catchedX
 
-  PitchRestriction pitchRestriction
+  PitchRestriction[] pitchRestriction=[null,null,null,null]
+  int restrictionNum=0
 
   int mode=0
   
@@ -36,6 +37,9 @@ class JamSketch extends SimplePianoRoll {
   int pnn=-1
   int nnn
   int prevY
+  int buttonX=80
+  int buttonGap=buttonX/3
+  int buttonNum=0
 
 
   //String logFileName
@@ -46,19 +50,29 @@ class JamSketch extends SimplePianoRoll {
     showMidiOutChooser()
     def p5ctrl = new ControlP5(this)
     p5ctrl.addButton("startMusic").
-    setLabel("Start / Stop").setPosition(20, 645).setSize(120, 40)
+    setLabel("Start / Stop").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
     p5ctrl.addButton("resetMusic").
-    setLabel("Reset").setPosition(160, 645).setSize(120, 40)
+    setLabel("Reset").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
     p5ctrl.addButton("loadCurve").
-    setLabel("Load").setPosition(300, 645).setSize(120, 40)
+    setLabel("Load").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
     p5ctrl.addButton("drawing").
-    setLabel("drawing").setPosition(440, 645).setSize(120, 40)
+    setLabel("drawing").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
     p5ctrl.addButton("edit").
-    setLabel("edit").setPosition(580, 645).setSize(120, 40)
+    setLabel("edit").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
     p5ctrl.addButton("fillR").
-    setLabel("fillR").setPosition(720, 645).setSize(120, 40)
+    setLabel("fillR").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
     p5ctrl.addButton("restart").
-    setLabel("restart").setPosition(860, 645).setSize(120, 40)
+    setLabel("restart").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
+
+    
+    p5ctrl.addButton("strong").
+    setLabel("strong").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(0));
+    p5ctrl.addButton("medium").
+    setLabel("medium").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(1));
+    p5ctrl.addButton("weak").
+    setLabel("weak").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(2));
+    p5ctrl.addButton("none").
+    setLabel("none").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(3));
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -74,9 +88,15 @@ class JamSketch extends SimplePianoRoll {
 
   void initData() {
 
-    pitchRestriction = new PitchRestriction()
-    pitchRestriction.setData(CFG)
-    pitchRestriction.setRestrictionList()
+    for(int i=0;i<4;i++){
+      pitchRestriction[i] = new PitchRestriction()
+      pitchRestriction[i].setData(CFG)
+    }
+    pitchRestriction[0].setRestrictionListStrong()
+    pitchRestriction[1].setRestrictionListMedium()
+    pitchRestriction[2].setRestrictionListWeak()
+    pitchRestriction[3].setRestrictionListNone()
+
 
     melodyData = new MelodyData2R(CFG.MIDFILENAME, width, this, this, CFG, pitchRestriction)
     smfread(melodyData.scc.getMIDISequence())
@@ -479,11 +499,23 @@ class JamSketch extends SimplePianoRoll {
       //println()
     }
 
+    
+
     // ChordSymbol2 cs;
     // for(int i=1;i<9;i++){
 
     // }
    }
+
+   void changeRestrictionList(int restrictionNum){
+      this.restrictionNum=restrictionNum
+      println("Now Restriction = "+this.restrictionNum)
+      melodyData.engine.restrictionNum=restrictionNum
+      println("Now Restriction = "+melodyData.engine.restrictionNum)
+      melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum=restrictionNum
+      println("Now Restriction = "+melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum)
+
+    }
 
    String getCurrent(){
     String current=""
