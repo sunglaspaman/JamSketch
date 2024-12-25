@@ -1,11 +1,17 @@
 import controlP5.ControlP5
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+
+import jp.crestmuse.cmx.filewrappers.*
+import jp.crestmuse.cmx.processing.*
+import jp.crestmuse.cmx.inference.*
+
 import jp.crestmuse.cmx.filewrappers.SCCDataSet
 import jp.crestmuse.cmx.processing.gui.SimplePianoRoll
 import jp.crestmuse.cmx.misc.*
 import static jp.crestmuse.cmx.misc.ChordSymbol2.*
 import java.io.File;
+import controlP5.*;
 
 class JamSketch extends SimplePianoRoll {
 
@@ -40,6 +46,12 @@ class JamSketch extends SimplePianoRoll {
   int buttonX=80
   int buttonGap=buttonX/3
   int buttonNum=0
+   
+  int startX
+  int endX
+
+  ControlP5 p5ctrl;
+  Button[] buttons;
 
 
   //String logFileName
@@ -64,15 +76,19 @@ class JamSketch extends SimplePianoRoll {
     p5ctrl.addButton("restart").
     setLabel("restart").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40)
 
-    
-    p5ctrl.addButton("strong").
+    buttons = new Button[4];
+    buttons[0]=p5ctrl.addButton("strong").
     setLabel("strong").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(0));
-    p5ctrl.addButton("medium").
+    buttons[1]=p5ctrl.addButton("medium").
     setLabel("medium").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(1));
-    p5ctrl.addButton("weak").
+    buttons[2]=p5ctrl.addButton("weak").
     setLabel("weak").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(2));
-    p5ctrl.addButton("none").
+    buttons[3]=p5ctrl.addButton("none").
     setLabel("none").setPosition(20+(buttonNum++*(buttonX+buttonGap)), 645).setSize(buttonX, 40).onClick(event -> changeRestrictionList(3));
+
+    buttons[restrictionNum].onClick(event -> changeRestrictionList(restrictionNum));
+
+
 
     if (CFG.MOTION_CONTROLLER != null) {
       CFG.MOTION_CONTROLLER.each { mCtrl ->
@@ -83,6 +99,7 @@ class JamSketch extends SimplePianoRoll {
     initData()
     // add WindowListener (windowClosing) which calls exit();
     makeLogFile()
+
   }
 
 
@@ -117,6 +134,8 @@ class JamSketch extends SimplePianoRoll {
 
   void draw() {
     super.draw()   
+        //MusicElement e=melodyData.engine.mr.getMusicElement(melodyData.engine.OUTLINE_LAYER,1,1)
+    //print(e.getMostLikely())
     if(restrictionIsFill){
       fillRestriction() 
       // int i=0
@@ -144,19 +163,29 @@ class JamSketch extends SimplePianoRoll {
         
           storeCursorPosition()
           updateCurve()
-          println(notenum2y(y2notenum(mouseY))+"+"+mouseY)
+          //println(notenum2y(y2notenum(mouseY))+"+"+mouseY)
         }
-        if(mode==1){
+        
+        }
+      }
+
+      if(mode==1){
           //println("111111111111111111")
+
           if(isInside(mouseX, mouseY)){
+            
             nnOfMouseX = melodyData.engine.getNotenum(x2measure(mouseX),calcTick(x2beat(mouseX)))
+
+            //output.println()
+            
           }
+          
 
           //println(x2measure(mouseX)+"_"+calcTick(x2beat(mouseX))+" "+mouseX+"_"+y2notenum(mouseY))
           if(nowDrawing){
             
             // print(y2notenum(mouseY))
-            print("||||")
+            //print("||||")
             // print(nnOfMouseX)sas
             // print("______")
             // println(y2notenum(pmouseY) as int % 12  ==nnOfMouseX as int)
@@ -164,11 +193,9 @@ class JamSketch extends SimplePianoRoll {
 
             // melodyData.engine.change(x2measure(mouseX),x2tick(mouseX),y2notenum(mouseY))
               melodyData.engine.change(x2measure(catchedX),calcTick(x2beat(catchedX)),y2notenum(mouseY))
-              
+
             }
           }
-        }
-      }
 
     }
 
@@ -282,9 +309,13 @@ class JamSketch extends SimplePianoRoll {
     if (isNowPlaying()) {
       stopMusic()
       makeLog("stop")
+      output.println("press stop")
+      output.flush()
     } else {
       playMusic()
       makeLog("play")
+      output.println("press play")
+      output.flush()
     }
   }
 
@@ -293,6 +324,8 @@ class JamSketch extends SimplePianoRoll {
     setTickPosition(0)
     dataModel.setFirstMeasure(CFG.INITIAL_BLANK_MEASURES)
     makeLog("reset")
+    output.println("press reset")
+    output.flush()
   }
 
   @Override
@@ -331,6 +364,8 @@ class JamSketch extends SimplePianoRoll {
 
   void loadCurve() {
     selectInput("Select a file to process:", "loadFileSelected")
+    output.println("press load")
+    output.flush()
   }
 
   void loadFileSelected(File selection) {
@@ -365,6 +400,7 @@ class JamSketch extends SimplePianoRoll {
   }
 
   void mousePressed() {
+    output.println("click:"+clickNum++)
     nowDrawing = true
     if(isInside(mouseX,mouseY)){
       nnOfMouseX = melodyData.engine.getNotenum(x2measure(mouseX),calcTick(x2beat(mouseX)))
@@ -377,9 +413,10 @@ class JamSketch extends SimplePianoRoll {
       // catchingMeasure=x2measure(mouseX)
       // catchTick=calcTick(x2beat(mouseX))
       }
-    }
     writeOperationLog(1)
     output.flush();
+    }
+
 
   }
   
@@ -388,20 +425,24 @@ class JamSketch extends SimplePianoRoll {
     isCatching= false
     
     if (isInside(mouseX, mouseY)) {
-      println(x2measure(mouseX))
-      println(CFG.NUM_OF_MEASURES)
+      //println(x2measure(mouseX))
+      //println(CFG.NUM_OF_MEASURES)
       if (!melodyData.engine.automaticUpdate()) {
         melodyData.engine.outlineUpdated(
 	   x2measure(mouseX) % CFG.NUM_OF_MEASURES,
            CFG.DIVISION - 1)
       }
+      writeOperationLog(3)
+      output.flush();
     }
     
-    writeOperationLog(3)
+
   }
 
   void mouseDragged() {
-    writeOperationLog(2)
+    if(isInside(mouseX, mouseY)){
+      writeOperationLog(2)
+    }
   }
 
   void keyReleased() {
@@ -449,9 +490,13 @@ class JamSketch extends SimplePianoRoll {
 
   void drawing(){
     mode=0
+    output.println("press drawing")
+    output.flush()
   }
   void edit(){
     mode=1
+    output.println("press edit")
+    output.flush()
   }
   void fillR(){
     restrictionIsFill = ! restrictionIsFill
@@ -459,6 +504,8 @@ class JamSketch extends SimplePianoRoll {
 
   void restart(){
     setTickPosition(0)
+    output.println("press restart")
+    output.flush()
   }
 
   int calcTick(double beat){
@@ -472,14 +519,14 @@ class JamSketch extends SimplePianoRoll {
   void editMelody(){}
   //
 
-   void fillRestriction(){
-    ChordSymbol cs
+  void fillRestriction(){
+    PitchRestriction pr = pitchRestriction[restrictionNum]
     int inCenterOfPR=48
     //println(y2notenum(height))
    //println("____________")
     for(int i=0;i<12;i++){
-      cs= melodyData.engine.mr.getMusicElement(melodyData.engine.CHORD_LAYER, i as int, 7 as int).getMostLikely()
-      for (NoteSymbol c_note  : cs.notes()) {
+      for(int t=0;t<12;t++){
+        for (int m : pr.tick2restrictionList(t).get(i)) {
         // print(c_note)
         // print(c_note.number())
         // print("=|")
@@ -492,19 +539,17 @@ class JamSketch extends SimplePianoRoll {
         // print("-")
         // print(beat2x(i+1,0))
         // print("|=")
-        fill(255,0,0,127)
-        rect(beat2x(i,0),notenum2y(c_note.number() as double +60),91,17.5)
+          fill(255,0,0,127)
+          rect(beat2x(i,0)+7.6*t,notenum2y(m as double +48),7.6,17.5)
+          rect(beat2x(i,0)+7.6*t,notenum2y(m as double +60),7.6,17.5)
+          rect(beat2x(i,0)+7.6*t,notenum2y(m as double +72),7.6,17.5)
         
+        }
       }
       //println()
     }
-
-    
-
-    // ChordSymbol2 cs;
-    // for(int i=1;i<9;i++){
-
-    // }
+    output.println("press fill")
+    output.flush()
    }
 
    void changeRestrictionList(int restrictionNum){
@@ -514,6 +559,13 @@ class JamSketch extends SimplePianoRoll {
       println("Now Restriction = "+melodyData.engine.restrictionNum)
       melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum=restrictionNum
       println("Now Restriction = "+melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum)
+      for (int i = 0; i < buttons.length; i++) {
+        buttons[i].setColorBackground(color(0, 45, 90)); // グレーに戻す
+      }
+      buttons[restrictionNum].setColorBackground(color(0, 145, 0)); // 緑に設定
+      //output.println("click:"+clickNum++)
+      output.println("restriction changed to:"+restrictionNum);
+      output.flush()
 
     }
 
@@ -549,18 +601,37 @@ class JamSketch extends SimplePianoRoll {
     switch(mouseType){
       case 1:
         //mouseClicked
-        output.println("click:"+clickNum++)
-        output.println("mode:"+mode)
-        output.println("start:("+"x:"+mouseX+","+"y:"+mouseY+")");
+        
+        if(mode==0){
+          startX=mouseX
+          output.println("mode:"+mode)
+          output.println("start:("+"x:"+mouseX+","+"y:"+mouseY+")");
+        } else {
+        //output.println("click:"+clickNum++)
+
         //prevElement=melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, x2measure(mouseX),calcTick(x2beat(mouseX)))
         //output.println("start:");
         //outputFile.click++
         //println(outputFile.click)
+        if(isCatching){
+          output.println("mode:"+mode)
+          MusicElement e
+          MusicElement starte
+          MusicElement ende
+          e=melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, x2measure(mouseX), calcTick(x2beat(mouseX)))
+          starte=melodyData.engine.getStartElement(x2measure(mouseX), calcTick(x2beat(mouseX)))
+          ende=melodyData.engine.getEndElement(x2measure(mouseX), calcTick(x2beat(mouseX)))
+          output.print("catch>")
+          output.print("measure:"+starte.measure()+"→"+ende.measure())
+          output.print("_tick:"+starte.tick()+"→"+ende.tick())
+          output.print("_nn:"+y2notenum(mouseY)+"→")
+        }
+        }
         break;
       case 2:
         //mouseDragged
         //nowElement = melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, x2measure(mouseX),calcTick(x2beat(mouseX)))
-        //nowElement = melodyData.engine(mostPrev(nowElement))
+        //nowElement = melodyData.engine.getStartElement(int measure,int tick)
         // if(prevElement!=nowElement){
         //   prevElement=nowElement
         //   nnn=prevElement.getMostLikely()  
@@ -573,9 +644,34 @@ class JamSketch extends SimplePianoRoll {
         
         break;
       case 3:
-        //mouseReleased
+        if(mode==0){
+          endX=mouseX
+
+          int sM=x2measure(startX)
+          int sT=calcTick(startX)%12
+          int eM=x2measure(endX)
+          int eT=calcTick(endX)
+          //println(sM+"+|"+sT+"+|"+eM+"+|"+eT)
+          for(int mea=sM;mea<=eM;mea++){
+            for(int tc=0;tc<12;tc++){
+              MusicElement e=melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, mea, tc)
+              //println(e.measure()+" "+e.tick()+" "+e.rest())
+              MusicElement ec=melodyData.engine.mr.getMusicElement(melodyData.engine.OUTLINE_LAYER, mea, tc)
+              if(!Double.isNaN(ec.getMostLikely())){
+              output.println("measure:"+mea+"_tick:"+tc+"_nn:"+e.getMostLikely())
+              //println("bbb"+e.getMostLikely())
+              } else {
+                output.println("measure:"+mea+"_tick:"+tc+"_nn:"+"rest")
+              }
+            }
+          }
         output.println("end:("+"x:"+mouseX+","+"y:"+mouseY+")")
         output.println()
+        } else {
+          output.println(y2notenum(mouseY))
+          output.flush()
+        }
+
         break;
     }
    }
