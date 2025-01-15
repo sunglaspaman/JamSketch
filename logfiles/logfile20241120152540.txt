@@ -1,6 +1,0 @@
-click:0
-mode:0
-start:(x:217,y:426)
-notenumber:0 (x:218,y:425)
-end:(x:1143,y:318)
-

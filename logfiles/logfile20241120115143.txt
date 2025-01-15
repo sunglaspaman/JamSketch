@@ -1,3 +1,0 @@
-click:0
-mode:0
-start:(x:455,y:417)

@@ -1,5 +1,0 @@
-end:(x:183,y:345)
-
-click:0
-mode:1
-start:(x:103,y:339)

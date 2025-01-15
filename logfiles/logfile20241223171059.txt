@@ -1,8 +1,0 @@
-click:0
-mode:0
-start:(x:108,y:367)
-end:(x:258,y:349)
-
-click:1
-mode:1
-start:(x:105,y:341)

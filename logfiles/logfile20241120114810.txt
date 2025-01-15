@@ -1,5 +1,0 @@
-click = 
-mouseX:137
-mouseX:359
-mouseX:567
-mouseX:818
