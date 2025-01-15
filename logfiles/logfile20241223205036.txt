@@ -1,0 +1,16 @@
+click:0
+restriction changed to:2
+
+click:1
+mode:0
+start:(x:107,y:326)
+end:(x:183,y:324)
+
+click:2
+mode:0
+start:(x:219,y:325)
+end:(x:236,y:288)
+
+click:3
+mode:0
+start:(x:196,y:307)

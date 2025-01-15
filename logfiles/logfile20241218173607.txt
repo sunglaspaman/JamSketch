@@ -1,0 +1,21 @@
+click:0
+mode:0
+start:(x:136,y:452)
+end:(x:563,y:200)
+
+click:1
+mode:1
+start:(x:185,y:375)
+end:(x:204,y:390)
+
+click:2
+restriction changed to:0
+
+click:3
+restriction changed to:0
+
+click:4
+mode:1
+start:(x:190,y:379)
+end:(x:191,y:331)
+

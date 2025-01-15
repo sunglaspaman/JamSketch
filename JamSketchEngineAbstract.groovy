@@ -23,7 +23,7 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
   static String MELODY_LAYER = "melody"
   static String CHORD_LAYER = "chord"
 
-  PitchRestriction restrictionList
+  PitchRestriction[] restrictionList
   
   void init(SCC scc, SCC.Part target_part, def cfg) {
     // print("JSEA1234567")
@@ -180,24 +180,29 @@ abstract class JamSketchEngineAbstract implements JamSketchEngine {
 
 
   void change(int measure, int tick, double nn){
-    // tick*=cfg.DIVISION
-    // tick/=cfg.BEATS_PER_MEASURE
-    // int tickt=tick as int
-    // measure=x2measure(mx)
-    // tick=x2tick(mx)
-    // nn=y2notenum(my)
-    def e = mr.getMusicElement(MELODY_LAYER, measure, tick)
-    //println(e.tiedFromPrevious())
-    while (e.prev().tiedFromPrevious()) {
-      e = e.prev();
-      //println(e.measure() + " " + e.tick())
-    }
-    //if (!automaticUpdate()) {
-      e.suspendUpdate()
-    //}
-    e.setEvidence(nn as int %12)
-    outlineUpdated(measure, tick)
-    //println(x2tick(mouseX))
+    // // tick*=cfg.DIVISION
+    // // tick/=cfg.BEATS_PER_MEASURE
+    // // int tickt=tick as int
+    // // measure=x2measure(mx)
+    // // tick=x2tick(mx)
+    // // nn=y2notenum(my)
+    // def e = mr.getMusicElement(MELODY_LAYER, measure, tick)
+    // //println(e.tiedFromPrevious())
+    // if(e.prev()!=null){
+    //   while (e.prev().tiedFromPrevious()) {
+    //     e = e.prev();
+    //   //println(e.measure() + " " + e.tick())
+    //   }
+    // }
+    // //if (!automaticUpdate()) {
+    //   e.suspendUpdate()
+    // //}
+    // if(restrictionList[restrictionNum].tick2restrictionList(tick).get(measure%12).contains(intNotenum%12) ? true :false ){
+    //   println(restrictionList[restrictionNum].tick2restrictionList(tick).get(measure%12).contains(intNotenum%12))
+    //   e.setEvidence(nn as int %12)
+    //   outlineUpdated(measure, tick)
+    // }
+    // //println(x2tick(mouseX))
 
   }
 

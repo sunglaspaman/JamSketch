@@ -164,6 +164,7 @@ class JamSketch extends SimplePianoRoll {
           storeCursorPosition()
           updateCurve()
           //println(notenum2y(y2notenum(mouseY))+"+"+mouseY)
+
         }
         
         }
@@ -461,7 +462,7 @@ class JamSketch extends SimplePianoRoll {
 //      melodyData.updateCurve('all')
     }else if(keyCode == CONTROL){
       mode=0
-      print(mode)
+      //print(mode)
     } else if (key == 'r') {
       restart()
     }
@@ -472,7 +473,7 @@ class JamSketch extends SimplePianoRoll {
     //int i=0
     if(keyCode == CONTROL){
       mode=1
-      print(mode)
+      //print("mode is "+mode)
     }
   }
 
@@ -516,6 +517,27 @@ class JamSketch extends SimplePianoRoll {
     inttick
   }
 
+  int getNearest(List<Integer> list,int v){
+    int i;		// ループ用
+		int num;	// 配列の添え字
+		int minv;	// 配列値-指定値vの絶対値
+
+		// 配列の個数が1未満の処理
+		//if ( 1 >list.length ) return -1;
+
+		// 指定値と全ての配列値の差を比較
+		num = 0;
+		minv = Math.abs( list.get(0) - v );
+		for ( i = 0; i < list.size();  i ++) {
+			if ( Math.abs( list.get(i) - v ) < minv) {
+				num = i;
+				minv = Math.abs( list.get(i) - v );
+			}
+		}
+
+		return list.get(num);
+  }
+
   void editMelody(){}
   //
 
@@ -554,11 +576,11 @@ class JamSketch extends SimplePianoRoll {
 
    void changeRestrictionList(int restrictionNum){
       this.restrictionNum=restrictionNum
-      println("Now Restriction = "+this.restrictionNum)
+      //println("Now Restriction = "+this.restrictionNum)
       melodyData.engine.restrictionNum=restrictionNum
-      println("Now Restriction = "+melodyData.engine.restrictionNum)
+      //println("Now Restriction = "+melodyData.engine.restrictionNum)
       melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum=restrictionNum
-      println("Now Restriction = "+melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum)
+      //println("Now Restriction = "+melodyData.engine.mr.name2layer.get(melodyData.engine.OUTLINE_LAYER).calculators.get(0).restrictionNum)
       for (int i = 0; i < buttons.length; i++) {
         buttons[i].setColorBackground(color(0, 45, 90)); // グレーに戻す
       }
@@ -567,6 +589,24 @@ class JamSketch extends SimplePianoRoll {
       output.println("restriction changed to:"+restrictionNum);
       output.flush()
 
+    }
+
+    void head(){
+                for(int m=0;m<12;m++){
+            for(int t=0;t<12;t++){
+              MusicElement e=melodyData.engine.mr.getMusicElement(melodyData.engine.MELODY_LAYER, m, t)
+              if(pitchRestriction[restrictionNum].tick2restrictionList(t).get(m%12).contains(e.getMostLikely()))
+                //e.setTiedFromPrevious(false)
+                if(e.prev()!=null){
+                  e.prev().setTiedFromPrevious(false)
+                }
+                // if(restrictionNum==0){
+                //   e.next().setTiedFromPrevious(false)
+                // }
+                e.setEvidence(getNearest(pitchRestriction[restrictionNum].tick2restrictionList(t).get(m),e.getMostLikely()))
+
+            }
+          }
     }
 
    String getCurrent(){

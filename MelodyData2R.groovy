@@ -6,7 +6,7 @@ class MelodyData2R {
   def scc
   def cfg
 
-  PitchRestriction restrictionList
+  PitchRestriction[] restrictionList
   
   MelodyData2R(filename, width, cmxcontrol, pianoroll, cfg, restrictionList) {
     this.width = width
@@ -14,6 +14,7 @@ class MelodyData2R {
     this.cfg = cfg
 
     this.restrictionList=restrictionList
+    println(restrictionList)
     //println(restrictionList.beat2restrictionList(0))
 
     scc = cmxcontrol.readSMFAsSCC(filename)
@@ -53,8 +54,8 @@ class MelodyData2R {
     resetCurve()
 
     engine.mr.name2layer.get(engine.OUTLINE_LAYER).calculators.get(0).restrictionList=this.restrictionList
-    println(engine.mr.name2layer.get(engine.OUTLINE_LAYER).calculators.get(0).restrictionList.beat2restrictionList(0))
-    print("MD2R")
+    //println(engine.mr.name2layer.get(engine.OUTLINE_LAYER).calculators.get(0).restrictionList.beat2restrictionList(0))
+    //print("MD2R")
 
   }
 

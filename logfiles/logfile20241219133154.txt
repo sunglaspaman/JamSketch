@@ -1,0 +1,185 @@
+click:0
+mode:0
+start:(x:122,y:449)
+end:(x:642,y:236)
+
+click:1
+mode:0
+start:(x:187,y:434)
+end:(x:338,y:328)
+
+click:2
+mode:0
+start:(x:148,y:420)
+end:(x:333,y:266)
+
+click:3
+restriction changed to:3
+
+click:4
+mode:0
+start:(x:239,y:471)
+end:(x:553,y:305)
+
+click:5
+restriction changed to:0
+
+click:6
+restriction changed to:0
+
+click:7
+mode:0
+start:(x:103,y:524)
+end:(x:186,y:318)
+
+click:8
+mode:0
+start:(x:227,y:466)
+end:(x:312,y:346)
+
+click:9
+restriction changed to:1
+
+click:10
+restriction changed to:2
+
+click:11
+restriction changed to:3
+
+click:12
+restriction changed to:0
+
+click:13
+restriction changed to:0
+
+click:14
+restriction changed to:1
+
+click:15
+restriction changed to:2
+
+click:16
+restriction changed to:3
+
+click:17
+restriction changed to:0
+
+click:18
+restriction changed to:0
+
+click:19
+mode:0
+start:(x:385,y:377)
+end:(x:522,y:357)
+
+click:20
+mode:0
+start:(x:152,y:427)
+end:(x:311,y:427)
+
+click:21
+restriction changed to:1
+
+click:22
+restriction changed to:2
+
+click:23
+restriction changed to:1
+
+click:24
+restriction changed to:2
+
+click:25
+restriction changed to:3
+
+click:26
+restriction changed to:2
+
+click:27
+restriction changed to:1
+
+click:28
+restriction changed to:2
+
+click:29
+restriction changed to:3
+
+click:30
+restriction changed to:0
+
+click:31
+restriction changed to:0
+
+click:32
+restriction changed to:1
+
+click:33
+restriction changed to:2
+
+click:34
+restriction changed to:3
+
+click:35
+restriction changed to:0
+
+click:36
+restriction changed to:0
+
+click:37
+restriction changed to:1
+
+click:38
+restriction changed to:2
+
+click:39
+restriction changed to:3
+
+click:40
+mode:0
+start:(x:1125,y:465)
+end:(x:1125,y:465)
+
+click:41
+mode:0
+start:(x:1051,y:437)
+end:(x:1021,y:313)
+
+click:42
+mode:0
+start:(x:1021,y:312)
+end:(x:983,y:404)
+
+click:43
+mode:0
+start:(x:1072,y:354)
+end:(x:1121,y:320)
+
+click:44
+mode:0
+start:(x:994,y:396)
+end:(x:1087,y:294)
+
+click:45
+restriction changed to:0
+
+click:46
+restriction changed to:0
+
+click:47
+restriction changed to:1
+
+click:48
+restriction changed to:2
+
+click:49
+restriction changed to:3
+
+click:50
+restriction changed to:0
+
+click:51
+restriction changed to:0
+
+click:52
+restriction changed to:3
+

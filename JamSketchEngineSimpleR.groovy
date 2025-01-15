@@ -7,7 +7,8 @@ class JamSketchEngineSimpleR extends JamSketchEngineAbstract {
 	// 		 cfg.ENT_BIAS, model)
   // }
 
-  PitchRestriction restrictionList
+  PitchRestriction[] restrictionList
+  int restrictionNum=0
 
   def musicCalculatorForOutline() {
     new NoteSeqGeneratorR(MELODY_LAYER, CHORD_LAYER, cfg.BEATS_PER_MEASURE,
@@ -39,16 +40,26 @@ class JamSketchEngineSimpleR extends JamSketchEngineAbstract {
     // tick=x2tick(mx)
     // nn=y2notenum(my)
     def e = mr.getMusicElement(MELODY_LAYER, measure, tick)
+    //println(e.measure()+"+"+e.tick())
     //println(e.tiedFromPrevious())
-    while (e.prev().tiedFromPrevious()) {
-      e = e.prev();
+    if(e.prev()!=null){
+     while (e.prev().tiedFromPrevious()) {
+        e = e.prev();
       //println(e.measure() + " " + e.tick())
+      }
     }
+    //println(e.measure()+"="+e.tick())
     //if (!automaticUpdate()) {
       e.suspendUpdate()
     //}
     int intNotenum=nn as int 
-    if(restrictionList.beat2restrictionListByTick(tick).get(measure%12).contains(intNotenum%12) ? true :false ){
+    //println("in:"+intNotenum%12)
+    //println(restrictionList[restrictionNum].tick2restrictionList(tick).get(measure%12))
+
+    //println(restrictionList[restrictionNum].tick2restrictionList(tick).get(measure%12).contains(intNotenum%12))
+
+    if(restrictionList[restrictionNum].tick2restrictionList(tick).get(measure%12).contains(intNotenum%12) ? true :false ){
+      
       e.setEvidence(nn as int %12)
       outlineUpdated(measure, tick)
     }

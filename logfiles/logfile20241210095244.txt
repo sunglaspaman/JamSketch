@@ -1,0 +1,15 @@
+click:0
+restriction changed to:0
+
+click:1
+restriction changed to:0
+
+click:2
+restriction changed to:1
+
+click:3
+restriction changed to:2
+
+click:4
+restriction changed to:3
+

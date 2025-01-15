@@ -14,11 +14,13 @@ class PitchRestriction {
     List<List<Integer>> restrictionListUp=[]
     MelodyData2R melodyData
     int divisionOfBeats
+    int toStrong
+    int tickSet
     int step
     List<Integer> instep = []
 
     PitchRestriction(){
-        //
+    //
     }
 
     void setData(cfg){
@@ -26,20 +28,48 @@ class PitchRestriction {
         divisionOfBeats=cfg.DIVISION/cfg.BEATS_PER_MEASURE
     }
 
-    void setRestrictionList(){
-        for(int i=0;i<12;i++){
+    void setRestrictionListStrong(){
+        for(int i=0;i<cfg.NUM_OF_MEASURES;i++){
             restrictionListDown.add(chordPitch(i))
             restrictionListUp.add(keyMajorScale(i))
         }
-        println(restrictionListDown)
-        println(restrictionListUp)
-    //     for(List<Integer> rList : restrictionList){
-    //     for (int note  : rList) {
-    //         print(note+"_")
-    //     }
-    //     println("↻")
-    //   }
-        //return restriction
+        tickSet=divisionOfBeats
+        toStrong=2
+        //println(restrictionListDown)
+        //println(restrictionListUp)
+    }
+
+    void setRestrictionListMedium(){
+        for(int i=0;i<cfg.NUM_OF_MEASURES;i++){
+            restrictionListDown.add(keyMajorScale(i))
+            restrictionListUp.add(keyMajorScale(i))
+        }
+        tickSet=divisionOfBeats
+        toStrong=2
+        //println(restrictionListDown)
+        //println(restrictionListUp)
+    }
+
+    void setRestrictionListWeak(){
+        for(int i=0;i<cfg.NUM_OF_MEASURES;i++){
+            restrictionListDown.add(keyMajorScale(i))
+            restrictionListUp.add(noRestrinction(i))
+        }
+        tickSet=divisionOfBeats
+        toStrong=2
+        //println(restrictionListDown)
+        //println(restrictionListUp)
+    }
+
+    void setRestrictionListNone(){
+        for(int i=0;i<cfg.NUM_OF_MEASURES;i++){
+            restrictionListDown.add(noRestrinction(i))
+            restrictionListUp.add(noRestrinction(i))
+        }
+        tickSet=divisionOfBeats
+        toStrong=2
+        //println(restrictionListDown)
+        //println(restrictionListUp)
     }
 
     List<List<Integer>> beat2restrictionList(int beat){
@@ -55,7 +85,13 @@ class PitchRestriction {
         return beat2restrictionList(beat)
     }
     List<List<Integer>> tick2restrictionList(int tick){
-        if(tick%(divisionOfBeats*2)==0){
+        /* groovylint-disable-next-line DuplicateNumberLiteral */
+        // if (((tick / divisionOfBeats) as int ) % toStrong == 0 && tick % (tickSet) == 0) {
+        //     return restrictionListDown
+        // } else {
+        //     return restrictionListUp
+        // }
+        if (((tick / divisionOfBeats) as int ) % toStrong == 0 && tick % (tickSet) == 0) {
             return restrictionListDown
         } else {
             return restrictionListUp
@@ -64,18 +100,12 @@ class PitchRestriction {
     
     List<Integer> chordPitch(i){
         List<Integer> pitchList =[]
-        
-        // ChordSymbol cs= melodyData.engine.mr.getMusicElement(melodyData.engine.CHORD_LAYER, i as int, 7 as int).getMostLikely()
-        // for (NoteSymbol c_note  : cs.notes()) {
-        //     pitchList.add(c_note.number())
-        // }
-
         ChordSymbol cs= cfg.chordprog.get(i)
         for (NoteSymbol c_note  : cs.notes()) {
             pitchList.add(c_note.number())
-            print(c_note.number()+" ")
+            //print(c_note.number()+" ")
         }
-        println();
+        //println();
 
         return pitchList
     }

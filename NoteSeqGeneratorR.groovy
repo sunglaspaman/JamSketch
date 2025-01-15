@@ -23,7 +23,8 @@ class NoteSeqGeneratorR implements MusicCalculator {
   def RHYTHM_WEIGHTS = [1, 0.2, 0.4, 0.8, 0.2, 0.4,
 			1, 0.2, 0.4, 0.8, 0.2, 0.4];
   
-  PitchRestriction restrictionList
+  PitchRestriction[] restrictionList
+  int restrictionNum=0
   //List<Integer> restr =Arrays.asList(0,4,7)
   //List<Integer> restr2 =Arrays.asList(2,7,11)
   // def cfg
@@ -81,7 +82,7 @@ class NoteSeqGeneratorR implements MusicCalculator {
 	      MusicRepresentation mr) { 
           //
               //print("JSEA")
-      print("tick:"+tick+" ")
+      //print("tick:"+tick+" ")
 
     MusicElement e_curve = mr.getMusicElement(layer, measure, tick) 
     double value = e_curve.getMostLikely() as double  
@@ -124,8 +125,9 @@ class NoteSeqGeneratorR implements MusicCalculator {
   //   }
   // }
   inRestriction=true
-  println("measure="+measure)
-  inRestriction=(restrictionList.beat2restrictionListByTick(tick).get(measure%12).contains(i) ? true :false )
+  //println("measure="+measure+"restrictionNum="+restrictionNum)
+  //println(restrictionList[restrictionNum].tick2restrictionList(tick))
+  inRestriction=(restrictionList[restrictionNum].tick2restrictionList(tick).get(measure%12).contains(i) ? true :false )
 
   //ir=(restr.contains(i) ? true :false )
   // for(int j : restr){
@@ -143,11 +145,11 @@ class NoteSeqGeneratorR implements MusicCalculator {
 	//   w4 * (-entdiff) +w6*inRes//+w5 * harmony //選ばれる確率を求める計算式
   //   println(scores[i])
   scores[i] = w1 * simil  +w6*inRes//+w5 * harmony //選ばれる確率を求める計算式
-    println(scores[i])
+    //println(scores[i])
     
 	
       }
-      println("ir="+inRestriction)
+      //println("ir="+inRestriction)
       // if(!ir){
       //   e_melo.setEvidence(0)
       // } else {

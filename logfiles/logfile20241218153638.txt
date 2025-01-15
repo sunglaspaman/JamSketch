@@ -1,0 +1,80 @@
+click:0
+restriction changed to:1
+
+click:1
+restriction changed to:0
+
+click:2
+restriction changed to:0
+
+click:3
+restriction changed to:1
+
+click:4
+restriction changed to:3
+
+click:5
+restriction changed to:2
+
+click:6
+restriction changed to:1
+
+click:7
+restriction changed to:0
+
+click:8
+restriction changed to:0
+
+click:9
+restriction changed to:1
+
+click:10
+restriction changed to:0
+
+click:11
+restriction changed to:0
+
+click:12
+restriction changed to:1
+
+click:13
+restriction changed to:2
+
+click:14
+restriction changed to:1
+
+click:15
+restriction changed to:2
+
+click:16
+restriction changed to:1
+
+click:17
+restriction changed to:2
+
+click:18
+restriction changed to:3
+
+click:19
+restriction changed to:0
+
+click:20
+restriction changed to:0
+
+click:21
+restriction changed to:1
+
+click:22
+restriction changed to:0
+
+click:23
+restriction changed to:0
+
+click:24
+mode:0
+start:(x:822,y:217)
+end:(x:787,y:263)
+
+click:25
+mode:0
+start:(x:764,y:329)

@@ -1,0 +1,22 @@
+click:0
+restriction changed to:0
+click:1
+restriction changed to:0
+end:(x:828,y:676)
+
+click:2
+restriction changed to:1
+end:(x:895,y:661)
+
+click:3
+restriction changed to:2
+end:(x:1004,y:668)
+
+click:4
+restriction changed to:3
+end:(x:1130,y:673)
+
+click:5
+restriction changed to:1
+end:(x:944,y:666)
+
