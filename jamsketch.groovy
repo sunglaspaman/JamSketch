@@ -50,6 +50,9 @@ class JamSketch extends SimplePianoRoll {
   int startX
   int endX
 
+  long startTime=0
+  long endTime=0
+
   ControlP5 p5ctrl;
   Button[] buttons;
 
@@ -641,11 +644,15 @@ class JamSketch extends SimplePianoRoll {
     switch(mouseType){
       case 1:
         //mouseClicked
-        
+        startTime=System.currentTimeMillis()
+        output.println("click time:"+startTime);
+        output.println("next time:"+(startTime-endTime));
         if(mode==0){
           startX=mouseX
           output.println("mode:"+mode)
           output.println("start:("+"x:"+mouseX+","+"y:"+mouseY+")");
+          
+          //long 変数名 = System.currentTimeMillis();
         } else {
         //output.println("click:"+clickNum++)
 
@@ -684,6 +691,9 @@ class JamSketch extends SimplePianoRoll {
         
         break;
       case 3:
+        endTime=System.currentTimeMillis()
+        output.println("release time:"+endTime);
+        output.println("drawing time:"+(endTime-startTime));
         if(mode==0){
           endX=mouseX
 
@@ -706,6 +716,7 @@ class JamSketch extends SimplePianoRoll {
             }
           }
         output.println("end:("+"x:"+mouseX+","+"y:"+mouseY+")")
+        //output.println("ed time:"+System.currentTimeMillis());
         output.println()
         } else {
           output.println(y2notenum(mouseY))
