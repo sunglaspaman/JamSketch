@@ -102,7 +102,8 @@ class JamSketch extends SimplePianoRoll {
     initData()
     // add WindowListener (windowClosing) which calls exit();
     makeLogFile()
-
+    endTime=System.currentTimeMillis()
+    output.println("launch time:"+endTime)
   }
 
 
